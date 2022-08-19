@@ -35,11 +35,20 @@ public Action Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
 
 public Action OnPlayerRunCmd(int client, int& buttons, int& impulse, float vel[3], float angles[3], int& weapon, int& subtype, int& cmdnum, int& tickcount, int& seed, int mouse[2])
 {
-	if (GetClientTeam(client) !=2 && GetClientTeam(client) !=3 ){ //prim fix, has to be this was cuz 'unassigned' is a thing >:(
+	if (GetClientTeam(client) <=2){ //prim fix, has to be this way cuz 'unassigned' is a thing >:(
+		ticksRolling[client] = 0;
 		angles[2] == 0.0;
+		g_bShouldStartCheckingUntrstedAngle = false;
+		sobrietyCheck = true;
 		return Plugin_Continue;
-	} 
+	} else {
+		if (sobrietyCheck && !intermission){ //NL fix?
+			g_bShouldStartCheckingUntrstedAngle = true;
+			sobrietyCheck = false;
+		}
+	}
 	if (!IsPlayerAlive(client)) { 
+		ticksRolling[client] = 0;
 		return Plugin_Continue;
 	}
 	// clamp pitch
@@ -72,14 +81,14 @@ public Action OnPlayerRunCmd(int client, int& buttons, int& impulse, float vel[3
        ticksRolling[client] = ticksRolling[client] + 1;
        char id[64];
        GetClientAuthId(client, AuthId_Steam2, id, sizeof(id));
-       LogToPluginFile("%N has been rolling for  %i ticks.", client, id, ticksRolling[client])
+       LogToPluginFile("%N (%s) has been rolling for  %i ticks.", client, id, ticksRolling[client])
 	}
 		if (ticksRolling[client] > 16){
-			char id[64], ip[32];
+			char id[64];
 			GetClientAuthId(client, AuthId_Steam2, id, sizeof(id));
-			KickClient(client, "Anti-Shitter (Roll)");
+			KickClient(client, "Anti-Shitter (Roll): If you believe this is a bug DM 'bgamboe#7767'");
 			PrintToChatAll("\x03%N \x07Was kicked for rolling.", client)
-			LogToPluginFile("%N (ID: %s) Was kicked for rolling %i ticks in a round.", client, id, ip, ticksRolling[client]);
+			LogToPluginFile("%N (ID: %s) Was kicked for rolling %i ticks in a round.", client, id, ticksRolling[client]);
 		}
 	}else{
 		angles[2] = 0.0;
