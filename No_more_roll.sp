@@ -35,7 +35,7 @@ public Action Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
 
 public Action OnPlayerRunCmd(int client, int& buttons, int& impulse, float vel[3], float angles[3], int& weapon, int& subtype, int& cmdnum, int& tickcount, int& seed, int mouse[2])
 {
-	if (GetClientTeam(client) <=2){ //prim fix, has to be this way cuz 'unassigned' is a thing >:(
+	if (GetClientTeam(client) !=2 && GetClientTeam(client) !=3 ){ //prim fix, has to be this was cuz 'unassigned' is a thing >:(
 		ticksRolling[client] = 0;
 		angles[2] == 0.0;
 		g_bShouldStartCheckingUntrstedAngle = false;
